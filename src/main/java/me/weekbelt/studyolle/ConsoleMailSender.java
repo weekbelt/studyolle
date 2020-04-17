@@ -47,6 +47,7 @@ public class ConsoleMailSender implements JavaMailSender {
 
     @Override
     public void send(SimpleMailMessage simpleMailMessage) throws MailException {
+        // 회원가입을 요청하면 출력
         log.info(simpleMailMessage.getText());
     }
 
