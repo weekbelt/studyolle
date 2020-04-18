@@ -72,6 +72,7 @@ class AccountControllerTest {
         Account account = accountRepository.findByEmail("vfrvfr4207@hanmail.net");
         assertThat(account).isNotNull();
         assertThat(account.getPassword()).isNotEqualTo("12345678");
+        assertThat(account.getEmailCheckToken()).isNotNull();
 
         // 가입 된 회원이 존재하는지 확인
         assertThat(accountRepository.existsByEmail("vfrvfr4207@hanmail.net")).isTrue();

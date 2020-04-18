@@ -1,4 +1,4 @@
-package me.weekbelt.studyolle;
+package me.weekbelt.studyolle.mail;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
