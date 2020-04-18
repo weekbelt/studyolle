@@ -1,5 +1,6 @@
 package me.weekbelt.studyolle.account;
 
+import me.weekbelt.studyolle.domain.Account;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,11 @@ class AccountControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"))
         ;
+
+        // 저장된 계정의 Password값이 인코딩이 되어있는지 확인
+        Account account = accountRepository.findByEmail("vfrvfr4207@hanmail.net");
+        assertThat(account).isNotNull();
+        assertThat(account.getPassword()).isNotEqualTo("12345678");
 
         // 가입 된 회원이 존재하는지 확인
         assertThat(accountRepository.existsByEmail("vfrvfr4207@hanmail.net")).isTrue();
