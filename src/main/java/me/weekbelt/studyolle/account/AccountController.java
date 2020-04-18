@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Controller
@@ -38,7 +37,8 @@ public class AccountController {
             return "account/sign-up";
         }
 
-        accountService.processNewAccount(signUpForm);
+        Account account = accountService.processNewAccount(signUpForm);
+        accountService.login(account);
         return "redirect:/";
     }
 
@@ -53,12 +53,13 @@ public class AccountController {
         }
 
         // 이메일은 있지만 토큰 값이 다른지 확인인
-       if(!account.getEmailCheckToken().equals(token)){
+       if(!account.isValidToken(token)){
             model.addAttribute("error", "worng.token");
             return view;
         }
 
        account.completeSignUp();
+       accountService.login(account);
        model.addAttribute("numberOfUser", accountRepository.count());
        model.addAttribute("nickname", account.getNickname());
 
