@@ -55,7 +55,7 @@ public class AccountService {
     public void login(Account account) {
         // username과 password를 조합해서 UsernamePasswordAuthenticationToken 인스턴스를 생성
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                account.getNickname(),
+                new UserAccount(account),
                 account.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
