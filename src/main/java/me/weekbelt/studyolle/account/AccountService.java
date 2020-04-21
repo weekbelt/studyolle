@@ -2,6 +2,7 @@ package me.weekbelt.studyolle.account;
 
 import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.domain.Account;
+import me.weekbelt.studyolle.settings.Notifications;
 import me.weekbelt.studyolle.settings.Profile;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -92,8 +93,22 @@ public class AccountService implements UserDetailsService {
         account.setOccupation(profile.getOccupation());
         account.setLocation(profile.getLocation());
         account.setBio(profile.getBio());
-        // TODO: 프로필 이미지 수정
+        account.setProfileImage(profile.getProfileImage());
         accountRepository.save(account);
-        // TODO: 문제가 하나 더 남아 있습니다.
+    }
+
+    public void updatePassword(Account account, String newPassword) {
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);    // merge
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+        account.setStudyCreatedByEmail(notifications.isStudyCreatedByEmail());
+        account.setStudyCreatedByWeb(notifications.isStudyCreatedByWeb());
+        account.setStudyUpdatedByEmail(notifications.isStudyUpdatedByEmail());
+        account.setStudyUpdatedByWeb(notifications.isStudyUpdatedByWeb());
+        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
+        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
+        accountRepository.save(account);
     }
 }
