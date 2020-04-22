@@ -8,12 +8,18 @@
     <title>StudyOlle</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
     <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         .container {
             max-width: 100%;
+        }
+        .tagify-outside{
+            border: 0;
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>
@@ -93,8 +99,8 @@
            th:href="@{/settings/profile}">프로필</a>
         <a href="#" class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active"
            th:href="@{/settings/password}">패스워드</a>
-        <a href="#" class="list-group-item list-group-item-action"
-           th:classappend="${currentMenu == 'notification'}? active" th:href="@{/settings/notifications}">알림</a>
+        <a href="#" class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'notifications'}? active"
+           th:href="@{/settings/notifications}">알림</a>
         <a href="#" class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active"
            th:href="@{/settings/tags}">관심 주제</a>
         <a href="#" class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active"

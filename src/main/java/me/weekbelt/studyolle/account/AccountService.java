@@ -2,6 +2,7 @@ package me.weekbelt.studyolle.account;
 
 import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.domain.Account;
+import me.weekbelt.studyolle.domain.Tag;
 import me.weekbelt.studyolle.settings.form.Notifications;
 import me.weekbelt.studyolle.settings.form.Profile;
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Transactional
 @RequiredArgsConstructor
@@ -121,5 +124,16 @@ public class AccountService implements UserDetailsService {
         mailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken() +
                 "&email=" + account.getEmail());
         javaMailSender.send(mailMessage);
+    }
+
+    public void addTag(Account account, Tag tag) {
+        // account엔티티는 Detached 상태 이기때문에 account를 먼저 읽어 온다
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getTags().add(tag));
+    }
+
+    public Set<Tag> getTags(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.orElseThrow().getTags();
     }
 }

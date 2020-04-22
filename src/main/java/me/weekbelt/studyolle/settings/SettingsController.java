@@ -4,24 +4,24 @@ import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.account.AccountService;
 import me.weekbelt.studyolle.account.CurrentUser;
 import me.weekbelt.studyolle.domain.Account;
-import me.weekbelt.studyolle.settings.form.NicknameForm;
-import me.weekbelt.studyolle.settings.form.Notifications;
-import me.weekbelt.studyolle.settings.form.PasswordForm;
-import me.weekbelt.studyolle.settings.form.Profile;
+import me.weekbelt.studyolle.domain.Tag;
+import me.weekbelt.studyolle.settings.form.*;
 import me.weekbelt.studyolle.settings.validator.NicknameFormValidator;
 import me.weekbelt.studyolle.settings.validator.PasswordFormValidator;
+import me.weekbelt.studyolle.tag.TagRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -30,6 +30,7 @@ public class SettingsController {
     private final AccountService accountService;
     private final ModelMapper modelMapper;
     private final NicknameFormValidator nicknameFormValidator;
+    private final TagRepository tagRepository;
 
     @InitBinder("passwordForm")
     public void passwordFormInitBinder(WebDataBinder webDataBinder) {
@@ -123,5 +124,26 @@ public class SettingsController {
         accountService.updateNickname(account, nicknameForm.getNickname());
         attributes.addFlashAttribute("message", "닉네임을 수정했습니다.");
         return "redirect:" + "/settings/account";
+    }
+
+    @GetMapping("/settings/tags")
+    public String updateTags(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        Set<Tag> tags = accountService.getTags(account);
+        model.addAttribute("tags", tags.stream().map(Tag::getTitle).collect(Collectors.toList()));
+
+        return "settings/tags";
+    }
+
+    @ResponseBody
+    @PostMapping("/settings/tags/add")
+    public ResponseEntity<?> addTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+        Tag tag = tagRepository.findByTitle(title).orElseGet(
+                () -> tagRepository.save(Tag.builder().title(tagForm.getTagTitle())
+                                .build()));
+
+        accountService.addTag(account, tag);
+        return ResponseEntity.ok().build();
     }
 }
