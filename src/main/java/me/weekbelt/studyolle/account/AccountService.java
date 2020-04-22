@@ -2,8 +2,8 @@ package me.weekbelt.studyolle.account;
 
 import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.domain.Account;
-import me.weekbelt.studyolle.settings.Notifications;
-import me.weekbelt.studyolle.settings.Profile;
+import me.weekbelt.studyolle.settings.form.Notifications;
+import me.weekbelt.studyolle.settings.form.Profile;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -103,5 +103,13 @@ public class AccountService implements UserDetailsService {
     public void updateNotifications(Account account, Notifications notifications) {
         modelMapper.map(notifications, account);
         accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, String nickname) {
+        account.setNickname(nickname);
+        accountRepository.save(account);
+
+        // login메소드를 추가해주는 이유는 navigation에서 dropdown에서의 nickname이 바뀌도록 해주기 위함이다.
+        login(account);
     }
 }

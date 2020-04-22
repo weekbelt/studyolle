@@ -1,4 +1,4 @@
-package me.weekbelt.studyolle.settings;
+package me.weekbelt.studyolle.settings.form;
 
 import lombok.Data;
 

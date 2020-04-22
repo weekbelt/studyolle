@@ -1,5 +1,6 @@
-package me.weekbelt.studyolle.settings;
+package me.weekbelt.studyolle.settings.validator;
 
+import me.weekbelt.studyolle.settings.form.PasswordForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
