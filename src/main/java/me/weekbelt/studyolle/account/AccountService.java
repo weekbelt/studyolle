@@ -112,4 +112,14 @@ public class AccountService implements UserDetailsService {
         // login메소드를 추가해주는 이유는 navigation에서 dropdown에서의 nickname이 바뀌도록 해주기 위함이다.
         login(account);
     }
+
+    public void sendLoginLink(Account account) {
+        account.generateEmailCheckToken();;
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(account.getEmail());
+        mailMessage.setSubject("스터디올래, 로그인 링크");
+        mailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken() +
+                "&email=" + account.getEmail());
+        javaMailSender.send(mailMessage);
+    }
 }
