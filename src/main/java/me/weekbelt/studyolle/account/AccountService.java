@@ -3,6 +3,7 @@ package me.weekbelt.studyolle.account;
 import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.domain.Account;
 import me.weekbelt.studyolle.domain.Tag;
+import me.weekbelt.studyolle.domain.Zone;
 import me.weekbelt.studyolle.settings.form.Notifications;
 import me.weekbelt.studyolle.settings.form.Profile;
 import org.modelmapper.ModelMapper;
@@ -134,5 +135,20 @@ public class AccountService implements UserDetailsService {
     public void removeTag(Account account, Tag tag) {
         Optional<Account> byId = accountRepository.findById(account.getId());
         byId.ifPresent(a -> a.getTags().remove(tag));
+    }
+
+    public Set<Zone> getZones(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.orElseThrow().getZones();
+    }
+
+    public void addZone(Account account, Zone zone) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getZones().add(zone));
+    }
+
+    public void removeZone(Account account, Zone zone) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getZones().remove(zone));
     }
 }
