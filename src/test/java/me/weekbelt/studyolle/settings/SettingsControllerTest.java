@@ -6,9 +6,13 @@ import me.weekbelt.studyolle.account.AccountRepository;
 import me.weekbelt.studyolle.account.AccountService;
 import me.weekbelt.studyolle.domain.Account;
 import me.weekbelt.studyolle.domain.Tag;
+import me.weekbelt.studyolle.domain.Zone;
 import me.weekbelt.studyolle.settings.form.TagForm;
+import me.weekbelt.studyolle.settings.form.ZoneForm;
 import me.weekbelt.studyolle.tag.TagRepository;
+import me.weekbelt.studyolle.zone.ZoneRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
+import static me.weekbelt.studyolle.settings.SettingsController.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -33,22 +36,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class SettingsControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    AccountRepository accountRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    TagRepository tagRepository;
-    @Autowired
-    AccountService accountService;
+    @Autowired MockMvc mockMvc;
+    @Autowired AccountRepository accountRepository;
+    @Autowired PasswordEncoder passwordEncoder;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired TagRepository tagRepository;
+    @Autowired AccountService accountService;
+    // 추가
+    @Autowired ZoneRepository zoneRepository;
+
+    // 추가
+    private Zone testZone = Zone.builder()
+            .city("test").localNameOfCity("테스트시").province("테스트주")
+            .build();
+
+    // 추가
+    @BeforeEach
+    void beforeEach() {
+        zoneRepository.save(testZone);
+    }
 
     @AfterEach
     public void afterEach() {
         accountRepository.deleteAll();
+        // 추가
+        zoneRepository.deleteAll();
     }
 
     @WithAccount("joohyuk")
@@ -217,5 +229,56 @@ class SettingsControllerTest {
                 .andExpect(status().isOk());
 
         assertThat(joohyuk.getTags().contains(newTag)).isFalse();
+    }
+
+    @WithAccount("joohyuk")
+    @DisplayName("계정의 지역 정보 수정 폼")
+    @Test
+    public void updateZonesForm() throws Exception {
+        mockMvc.perform(get(ROOT + SETTINGS + ZONES))
+                .andExpect(view().name(SETTINGS + ZONES))
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("zones"))
+                .andExpect(model().attributeExists("whitelist"));
+    }
+
+    @WithAccount("joohyuk")
+    @DisplayName("계정의 지역 정보 추가")
+    @Test
+    public void addZone() throws Exception {
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(testZone.toString());
+
+        mockMvc.perform(post(ROOT + SETTINGS + ZONES + "/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(zoneForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        Account joohyuk = accountRepository.findByNickname("joohyuk");
+        Zone zone = zoneRepository.findByCityAndProvince(testZone.getCity(),
+                testZone.getProvince());
+        assertThat(joohyuk.getZones().contains(zone)).isTrue();
+    }
+
+    @WithAccount("joohyuk")
+    @DisplayName("계정의 지역 정보 삭제")
+    @Test
+    public void removeZone() throws Exception {
+        Account joohyuk = accountRepository.findByNickname("joohyuk");
+        Zone zone = zoneRepository.findByCityAndProvince(testZone.getCity(),
+                testZone.getProvince());
+        accountService.addZone(joohyuk, zone);
+
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(testZone.toString());
+
+        mockMvc.perform(post(ROOT + SETTINGS + ZONES + "/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(zoneForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+                assertThat(joohyuk.getZones().contains(zone)).isFalse();
     }
 }
