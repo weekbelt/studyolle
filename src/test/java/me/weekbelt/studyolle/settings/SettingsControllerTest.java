@@ -1,16 +1,25 @@
 package me.weekbelt.studyolle.settings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.weekbelt.studyolle.WithAccount;
 import me.weekbelt.studyolle.account.AccountRepository;
+import me.weekbelt.studyolle.account.AccountService;
 import me.weekbelt.studyolle.domain.Account;
+import me.weekbelt.studyolle.domain.Tag;
+import me.weekbelt.studyolle.settings.form.TagForm;
+import me.weekbelt.studyolle.tag.TagRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,18 +28,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class SettingsControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
     @Autowired
     AccountRepository accountRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    ObjectMapper objectMapper;
+    @Autowired
+    TagRepository tagRepository;
+    @Autowired
+    AccountService accountService;
 
     @AfterEach
     public void afterEach() {
@@ -149,6 +163,59 @@ class SettingsControllerTest {
                 .andExpect(flash().attributeExists("message"));
 
         assertThat(accountRepository.findByNickname(newNickname)).isNotNull();
+    }
 
+    @WithAccount("joohyuk")
+    @DisplayName("계정의 태그 수정 폼")
+    @Test
+    public void updateTagForm() throws Exception {
+        mockMvc.perform(get("/settings/tags"))
+                .andExpect(view().name("settings/tags"))
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("whitelist"))
+                .andExpect(model().attributeExists("tags"));
+    }
+
+    @WithAccount("joohyuk")
+    @DisplayName("계정에 태그 추가")
+    @Test
+    public void addTag() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post("/settings/tags/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tagForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        Tag newTag = tagRepository.findByTitle("newTag").get();
+        assertThat(newTag).isNotNull();
+        Account joohyuk = accountRepository.findByNickname("joohyuk");
+        // 만약 @Transactional이 없다면 account는 detached 상태
+        assertThat(joohyuk.getTags().contains(newTag))
+                .isTrue();
+    }
+
+    @WithAccount("joohyuk")
+    @DisplayName("계정에 태그 삭제")
+    @Test
+    public void removeTag() throws Exception {
+        Account joohyuk = accountRepository.findByNickname("joohyuk");
+        Tag newTag = tagRepository.save(Tag.builder().title("newTag").build());
+        accountService.addTag(joohyuk, newTag);
+
+        assertThat(joohyuk.getTags().contains(newTag)).isTrue();
+
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post("/settings/tags/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tagForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertThat(joohyuk.getTags().contains(newTag)).isFalse();
     }
 }
