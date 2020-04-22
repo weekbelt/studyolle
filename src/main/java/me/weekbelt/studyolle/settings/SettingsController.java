@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.account.AccountService;
 import me.weekbelt.studyolle.account.CurrentUser;
 import me.weekbelt.studyolle.domain.Account;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -14,24 +15,24 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.management.Notification;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @Controller
 public class SettingsController {
 
+    private final AccountService accountService;
+    private final ModelMapper modelMapper;
+
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(new PasswordFormValidator());
     }
 
-    private final AccountService accountService;
-
     @GetMapping("/settings/profile")
     public String updateProfileForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
-        model.addAttribute(new Profile(account));
+        model.addAttribute(modelMapper.map(account, Profile.class));
         return "settings/profile";
     }
 
@@ -75,7 +76,7 @@ public class SettingsController {
     @GetMapping("/settings/notifications")
     public String updateNotificationsForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
-        model.addAttribute(new Notifications(account));
+        model.addAttribute(modelMapper.map(account, Notifications.class));
         return "settings/notifications";
     }
 
