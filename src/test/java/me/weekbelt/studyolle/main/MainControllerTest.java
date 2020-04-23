@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.mail.MessagingException;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -33,7 +35,7 @@ class MainControllerTest {
     AccountRepository accountRepository;
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws MessagingException {
         // 회원 가입
         SignUpForm signUpForm = new SignUpForm();
         signUpForm.setNickname("joohyuk");

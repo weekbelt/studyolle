@@ -1,6 +1,7 @@
 package me.weekbelt.studyolle;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import me.weekbelt.studyolle.account.AccountService;
 import me.weekbelt.studyolle.account.SignUpForm;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
     private final AccountService accountService;
 
     // @WithUserDetails(value = "joohyuk", setupBefore = TestExecutionEvent.TEST_EXECUTION)가 원래 하는일
+    @SneakyThrows
     @Override
     public SecurityContext createSecurityContext(WithAccount withAccount) {
         String nickname = withAccount.value();

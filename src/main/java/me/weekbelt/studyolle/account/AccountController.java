@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class AccountController {
     }
 
     @PostMapping("/sign-up")
-    public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
+    public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) throws MessagingException {
         if (errors.hasErrors()) {
             return "account/sign-up";
         }
@@ -74,7 +75,7 @@ public class AccountController {
     }
 
     @GetMapping("/resend-confirm-email")
-    public String resendConfirmEmail(@CurrentAccount Account account, Model model){
+    public String resendConfirmEmail(@CurrentAccount Account account, Model model) throws MessagingException {
         if (!account.canSendConfirmEmail()){
             model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
             model.addAttribute("email", account.getEmail());

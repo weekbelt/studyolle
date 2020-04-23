@@ -1,6 +1,8 @@
 package me.weekbelt.studyolle.account;
 
 import me.weekbelt.studyolle.domain.Account;
+import me.weekbelt.studyolle.mail.EmailMessage;
+import me.weekbelt.studyolle.mail.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,8 @@ class AccountControllerTest {
     @Autowired
     private AccountRepository accountRepository;
 
-    @MockBean
-    JavaMailSender javaMailSender;
+//    @MockBean JavaMailSender javaMailSender;
+    @MockBean EmailService emailService;        // 대체
 
     @DisplayName("회원 가입 화면 보이는지 테스트")
     @Test
@@ -82,7 +84,7 @@ class AccountControllerTest {
         // 가입 된 회원이 존재하는지 확인
         assertThat(accountRepository.existsByEmail("vfrvfr4207@hanmail.net")).isTrue();
         // 회원가입시 JavaMailSender 통해 SimpleMailMessage 호출되는지
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().sendEmail(any(EmailMessage.class));
 
     }
 
