@@ -2,7 +2,7 @@ package me.weekbelt.studyolle.main;
 
 import me.weekbelt.studyolle.account.AccountRepository;
 import me.weekbelt.studyolle.account.AccountService;
-import me.weekbelt.studyolle.account.SignUpForm;
+import me.weekbelt.studyolle.account.form.SignUpForm;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

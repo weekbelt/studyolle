@@ -1,6 +1,7 @@
 package me.weekbelt.studyolle.account;
 
 import lombok.RequiredArgsConstructor;
+import me.weekbelt.studyolle.account.form.SignUpForm;
 import me.weekbelt.studyolle.domain.Account;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

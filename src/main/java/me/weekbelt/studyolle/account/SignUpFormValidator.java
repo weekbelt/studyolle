@@ -1,6 +1,7 @@
 package me.weekbelt.studyolle.account;
 
 import lombok.RequiredArgsConstructor;
+import me.weekbelt.studyolle.account.form.SignUpForm;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -3,7 +3,7 @@ package me.weekbelt.studyolle;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import me.weekbelt.studyolle.account.AccountService;
-import me.weekbelt.studyolle.account.SignUpForm;
+import me.weekbelt.studyolle.account.form.SignUpForm;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

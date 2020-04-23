@@ -1,4 +1,4 @@
-package me.weekbelt.studyolle.account;
+package me.weekbelt.studyolle.account.form;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
