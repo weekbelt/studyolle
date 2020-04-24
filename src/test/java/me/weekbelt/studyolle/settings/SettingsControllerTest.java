@@ -201,7 +201,7 @@ class SettingsControllerTest {
                 .with(csrf()))
                 .andExpect(status().isOk());
 
-        Tag newTag = tagRepository.findByTitle("newTag").get();
+        Tag newTag = tagRepository.findByTitle("newTag");
         assertThat(newTag).isNotNull();
         Account joohyuk = accountRepository.findByNickname("joohyuk");
         // 만약 @Transactional이 없다면 account는 detached 상태

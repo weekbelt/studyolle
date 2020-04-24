@@ -12,6 +12,7 @@ import me.weekbelt.studyolle.settings.form.*;
 import me.weekbelt.studyolle.settings.validator.NicknameFormValidator;
 import me.weekbelt.studyolle.settings.validator.PasswordFormValidator;
 import me.weekbelt.studyolle.tag.TagRepository;
+import me.weekbelt.studyolle.tag.TagService;
 import me.weekbelt.studyolle.zone.ZoneRepository;
 import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
@@ -48,6 +49,7 @@ public class SettingsController {
     private final TagRepository tagRepository;
     private final ObjectMapper objectMapper;
     private final ZoneRepository zoneRepository;
+    private final TagService tagService;
 
     @InitBinder("passwordForm")
     public void passwordFormInitBinder(WebDataBinder webDataBinder) {
@@ -78,11 +80,9 @@ public class SettingsController {
 
         accountService.updateProfile(account, profile);
         attributes.addFlashAttribute("message", "프로필을 수정했습니다.");
-//        return "redirect:" + "/settings/profile";
         return "redirect:/" + SETTINGS + PROFILE;
     }
 
-//    @GetMapping("/settings/password")
     @GetMapping(PASSWORD)
     public String updatePasswordForm(@CurrentAccount Account account, Model model) {
         model.addAttribute(account);
@@ -165,11 +165,7 @@ public class SettingsController {
     @PostMapping(TAGS + "/add")
     public ResponseEntity<?> addTag(@CurrentAccount Account account,
                                     @RequestBody TagForm tagForm) {
-        String title = tagForm.getTagTitle();
-        Tag tag = tagRepository.findByTitle(title).orElseGet(
-                () -> tagRepository.save(Tag.builder().title(tagForm.getTagTitle())
-                                .build()));
-
+        Tag tag = tagService.findOrCreateNew(tagForm.getTagTitle());
         accountService.addTag(account, tag);
         return ResponseEntity.ok().build();
     }
@@ -179,7 +175,7 @@ public class SettingsController {
     public ResponseEntity<?> removeTag(@CurrentAccount Account account,
                                        @RequestBody TagForm tagForm) {
         String title = tagForm.getTagTitle();
-        Tag tag = tagRepository.findByTitle(title).get();
+        Tag tag = tagRepository.findByTitle(title);
         if (tag == null){
             return ResponseEntity.badRequest().build();
         }

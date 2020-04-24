@@ -7,12 +7,19 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 @NamedEntityGraph(name = "Study.withAll", attributeNodes = {
         @NamedAttributeNode("tags"),
         @NamedAttributeNode("zones"),
         @NamedAttributeNode("managers"),
         @NamedAttributeNode("members")})
+@NamedEntityGraph(name = "Study.withTagsAndManagers", attributeNodes = {
+        @NamedAttributeNode("tags"),
+        @NamedAttributeNode("managers")
+})
+@NamedEntityGraph(name = "Study.withZonesAndManagers", attributeNodes = {
+        @NamedAttributeNode("zones"),
+        @NamedAttributeNode("managers")
+})
 @Builder @AllArgsConstructor @NoArgsConstructor
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @Entity
@@ -77,5 +84,9 @@ public class Study {
 
     public boolean isManager(UserAccount userAccount) {
         return this.managers.contains(userAccount.getAccount());
+    }
+
+    public boolean isManagedBy(Account account) {
+        return this.getManagers().contains(account);
     }
 }

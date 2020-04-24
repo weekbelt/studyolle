@@ -9,5 +9,5 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-    Optional<Tag> findByTitle(String title);
+    Tag findByTitle(String title);
 }
