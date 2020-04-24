@@ -82,7 +82,6 @@ public class AccountController {
             model.addAttribute("email", account.getEmail());
             return "account/check-email";
         }
-
         accountService.sendSignUpConfirmEmail(account);
         return "redirect:/";
     }
@@ -90,13 +89,9 @@ public class AccountController {
     @GetMapping("/profile/{nickname}")
     public String viewProfile(@PathVariable String nickname, Model model,
                               @CurrentAccount Account account){
-        Account byNickname = accountRepository.findByNickname(nickname);
-        if (byNickname == null){
-            throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
-        }
-
-        model.addAttribute(byNickname);                 // byNickname의 상위타입의 이름의 camel_case로 key값이 설정된다.
-        model.addAttribute("isOwner", byNickname.equals(account));
+        Account accountToView = accountService.getAccount(nickname);
+        model.addAttribute(accountToView);                 // byNickname의 상위타입의 이름의 camel_case로 key값이 설정된다.
+        model.addAttribute("isOwner", accountToView.equals(account));
         return "account/profile";
     }
 
