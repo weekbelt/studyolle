@@ -81,6 +81,13 @@ public class StudyService {
         return study;
     }
 
+    public Study getStudyToUpdateStatus(Account account, String path) {
+        Study study = studyRepository.findStudyWithManagersByPath(path);
+        checkIfExistingStudy(path, study);
+        checkIfManager(account, study);
+        return study;
+    }
+
     public void addZone(Study study, Zone zone) {
         study.getZones().add(zone);
     }
@@ -90,14 +97,30 @@ public class StudyService {
     }
 
     private void checkIfExistingStudy(String path, Study study) {
-        if (study == null){
+        if (study == null) {
             throw new IllegalArgumentException(path + "에 해당하는 스터디가 없습니다.");
         }
     }
 
     private void checkIfManager(Account account, Study study) {
-        if (!study.isManagedBy(account)){
+        if (!study.isManagedBy(account)) {
             throw new AccessDeniedException("해당 기능을 사용할 수 없습니다.");
         }
+    }
+
+    public void publish(Study study) {
+        study.publish();
+    }
+
+    public void close(Study study) {
+        study.close();
+    }
+
+    public void startRecruit(Study study) {
+        study.startRecruit();
+    }
+
+    public void stopRecruit(Study study) {
+        study.stopRecruit();
     }
 }
