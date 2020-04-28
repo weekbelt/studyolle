@@ -13,7 +13,7 @@
         </div>
         <div class="col-8">
             <div th:replace="fragments.html::message"></div>
-            <form class="needs-validation" th:action="@{'/study/' + ${study.getPath()} + '/settings/description'}"
+            <form class="needs-validation" th:action="@{'/study/' + ${study.getEncodedPath()} + '/settings/description'}"
                   th:object="${studyDescriptionForm}" method="post" novalidate>
                 <div class="form-group">
                     <label for="shortDescription">짧은 소개</label>
