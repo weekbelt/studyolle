@@ -1,7 +1,6 @@
 package me.weekbelt.studyolle.event.form;
 
 import lombok.Data;
-import me.weekbelt.studyolle.domain.Event;
 import me.weekbelt.studyolle.domain.EventType;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
