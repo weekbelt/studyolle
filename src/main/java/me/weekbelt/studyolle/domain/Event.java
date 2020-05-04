@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(
+        name = "Event.withEnrollments",
+        attributeNodes = @NamedAttributeNode("enrollments")
+)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -87,6 +91,11 @@ public class Event {
             }
         }
         return false;
+    }
+
+    // 여기서 N+1 문제가 발생한다. 각각의 모임 마다 enrollments를 불러옴
+    public int numberOfRemainSpots() {
+        return this.limitOfEnrollments - (int) this.enrollments.stream().filter(Enrollment::isAccepted).count();
     }
 
 }
