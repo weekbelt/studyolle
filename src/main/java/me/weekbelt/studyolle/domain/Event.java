@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NamedEntityGraph(
         name = "Event.withEnrollments",
@@ -147,5 +148,18 @@ public class Event {
             }
         }
         return null;
+    }
+
+    public void acceptWaitingList() {
+        if(this.isAbleToAcceptWaitingEnrollment()) {
+            var waitingList = getWaitingList();  // 참가 확정 대기중의 리스트를 가져옴
+            int numberToAccept = (int) Math.min(this.limitOfEnrollments - this.getNumberOfAcceptedEnrollments(), waitingList.size());
+            waitingList.subList(0, numberToAccept).forEach(e -> e.setAccepted(true));
+        }
+    }
+
+    private List<Enrollment> getWaitingList() {
+        return this.enrollments.stream().filter(enrollment -> !enrollment.isAccepted())
+                .collect(Collectors.toList());
     }
 }
