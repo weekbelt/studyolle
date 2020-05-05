@@ -1,18 +1,14 @@
 package me.weekbelt.studyolle.event;
 
 import lombok.RequiredArgsConstructor;
-import me.weekbelt.studyolle.account.CurrentAccount;
 import me.weekbelt.studyolle.domain.Account;
 import me.weekbelt.studyolle.domain.Enrollment;
 import me.weekbelt.studyolle.domain.Event;
 import me.weekbelt.studyolle.domain.Study;
 import me.weekbelt.studyolle.event.form.EventForm;
-import me.weekbelt.studyolle.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
 
@@ -54,5 +50,12 @@ public class EventService {
             event.addEnrollment(enrollment);
             enrollmentRepository.save(enrollment);
         }
+    }
+
+    public void cancelEnrollment(Event event, Account account) {
+        Enrollment enrollment = enrollmentRepository.findByEventAndAccount(event, account);
+        event.removeEnrollment(enrollment);
+        enrollmentRepository.delete(enrollment);
+        event.acceptNextWaitingEnrollment();
     }
 }

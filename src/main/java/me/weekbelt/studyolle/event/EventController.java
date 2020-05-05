@@ -144,7 +144,7 @@ public class EventController {
     }
 
     @PostMapping("/events/{id}/disenroll")
-    public String newEnrollment(@CurrentAccount Account account, @PathVariable String path,
+    public String cancelEnrollment(@CurrentAccount Account account, @PathVariable String path,
                                 @PathVariable Long id) {
         Study study = studyService.getStudyToEnroll(path);
         eventService.cancelEnrollment(eventService.findEventById(id), account);

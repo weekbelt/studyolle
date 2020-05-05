@@ -75,7 +75,7 @@ public class Event {
     public boolean isAttended(UserAccount userAccount) {
         Account account = userAccount.getAccount();
         for (Enrollment enrollment : enrollments) {
-            if (enrollment.getAccount().equals(account) && enrollment.isAttended()){
+            if (enrollment.getAccount().equals(account) && enrollment.isAttended()) {
                 return true;
             }
         }
@@ -114,5 +114,38 @@ public class Event {
                 && !enrollments.contains(enrollment)
                 && !enrollment.isAttended()
                 && enrollment.isAccepted();
+    }
+
+    public boolean isAbleToAcceptWaitingEnrollment() {
+        return this.eventType == EventType.FCFS
+                && this.limitOfEnrollments > this.getNumberOfAcceptedEnrollments();
+    }
+
+    public void addEnrollment(Enrollment enrollment) {
+        this.enrollments.add(enrollment);
+        enrollment.setEvent(this);
+    }
+
+    public void removeEnrollment(Enrollment enrollment) {
+        this.enrollments.remove(enrollment);
+        enrollment.setEvent(null);
+    }
+
+    public void acceptNextWaitingEnrollment() {
+        if(this.isAbleToAcceptWaitingEnrollment()) {
+            Enrollment enrollmentToAccept = this.getTheFirstWaitingEnrollment();
+            if (enrollmentToAccept != null){
+                enrollmentToAccept.setAccepted(true);
+            }
+        }
+    }
+
+    private Enrollment getTheFirstWaitingEnrollment() {
+        for (Enrollment enrollment : this.enrollments) {
+            if (!enrollment.isAccepted()) {
+                return enrollment;
+            }
+        }
+        return null;
     }
 }
