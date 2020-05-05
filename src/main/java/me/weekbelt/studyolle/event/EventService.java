@@ -3,6 +3,7 @@ package me.weekbelt.studyolle.event;
 import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.account.CurrentAccount;
 import me.weekbelt.studyolle.domain.Account;
+import me.weekbelt.studyolle.domain.Enrollment;
 import me.weekbelt.studyolle.domain.Event;
 import me.weekbelt.studyolle.domain.Study;
 import me.weekbelt.studyolle.event.form.EventForm;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final ModelMapper modelMapper;
 
     public Event createEvent(Event event, Study study, Account account) {
@@ -41,5 +43,16 @@ public class EventService {
 
     public void deleteEvent(Event event) {
         eventRepository.delete(event);
+    }
+
+    public void newEnrollment(Event event, Account account) {
+        if (!enrollmentRepository.existsByEventAndAccount(event, account)) {
+            Enrollment enrollment = new Enrollment();
+            enrollment.setEnrolledAt(LocalDateTime.now());
+            enrollment.setAccepted(event.isAbleToAcceptWaitingEnrollment());
+            enrollment.setAccount(account);
+            event.addEnrollment(enrollment);
+            enrollmentRepository.save(enrollment);
+        }
     }
 }
