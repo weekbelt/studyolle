@@ -47,6 +47,7 @@ public class EventService {
             enrollment.setEnrolledAt(LocalDateTime.now());
             enrollment.setAccepted(event.isAbleToAcceptWaitingEnrollment());
             enrollment.setAccount(account);
+
             event.addEnrollment(enrollment);
             enrollmentRepository.save(enrollment);
         }
