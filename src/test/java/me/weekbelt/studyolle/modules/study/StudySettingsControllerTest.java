@@ -1,6 +1,5 @@
 package me.weekbelt.studyolle.modules.study;
 
-import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.infra.MockMvcTest;
 import me.weekbelt.studyolle.modules.account.Account;
 import me.weekbelt.studyolle.modules.account.AccountFactory;
@@ -9,10 +8,7 @@ import me.weekbelt.studyolle.modules.account.WithAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

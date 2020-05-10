@@ -1,19 +1,14 @@
 package me.weekbelt.studyolle.modules.study;
 
-import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.infra.MockMvcTest;
 import me.weekbelt.studyolle.modules.account.AccountFactory;
 import me.weekbelt.studyolle.modules.account.WithAccount;
 import me.weekbelt.studyolle.modules.account.AccountRepository;
 import me.weekbelt.studyolle.modules.account.Account;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -64,8 +59,17 @@ public class StudyControllerTest {
     @WithAccount("joohyuk")
     @DisplayName("스터디 개설 - 실패")
     public void createStudy_fail() throws Exception {
+        Study study = new Study();
+        study.setPath("test-path");
+        study.setTitle("test study");
+        study.setShortDescription("short description");
+        study.setFullDescription("<p>full description</p>");
+
+        Account joohyuk = accountRepository.findByNickname("joohyuk");
+        studyService.createNewStudy(study, joohyuk);
+
         mockMvc.perform(post("/new-study")
-                .param("path", "wrong path")
+                .param("path", "test-path")
                 .param("title", "study title")
                 .param("shortDescription", "short description of a study")
                 .param("fullDescription", "full description of a study")
@@ -75,9 +79,6 @@ public class StudyControllerTest {
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeExists("studyForm"))
                 .andExpect(model().attributeExists("account"));
-
-        Study study = studyRepository.findByPath("test-path");
-        assertThat(study).isNull();
 
     }
 
