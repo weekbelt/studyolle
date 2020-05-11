@@ -21,6 +21,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @RequiredArgsConstructor
@@ -41,29 +43,51 @@ public class StudyEventListener {
     public void handleStudyCreatedEvent(StudyCreatedEvent studyCreatedEvent) {
         // Tags와 Zones를 참조할수 있는 Study를 가져왔다.
         Study study = studyRepository.findStudyWithTagsAndZonesById(studyCreatedEvent.getStudy().getId());
-        Iterable<Account> accounts = accountRepository.findAll(AccountPredicates.findByTagsAndZones(study.getTags(), study.getZones()));
+        Iterable<Account> accounts = accountRepository
+                .findAll(AccountPredicates.findByTagsAndZones(study.getTags(), study.getZones()));
         accounts.forEach(account -> {
-            if (account.isStudyCreatedByEmail()){
-                sendStudyCreatedEmail(study, account);
+            if (account.isStudyCreatedByEmail()) {
+                sendStudyCreatedEmail(study, account, "새로운 스터디가 추가되었습니다.",
+                        "스터디올래, '" + study.getTitle() + "' 스터디가 생겼습니다."); // 추가
             }
 
             if (account.isStudyCreatedByWeb()) {
-                saveStudyCreatedNotification(study, account);
+                createNotification(study, account, study.getShortDescription(), NotificationType.STUDY_CREATED);   // 수정
             }
         });
     }
 
-    private void sendStudyCreatedEmail(Study study, Account account) {
+    @EventListener
+    public void handleStudyUpdateEvent(StudyUpdateEvent studyUpdateEvent) {
+        Study study = studyRepository.findStudyWithManagersAndMembersById(studyUpdateEvent.getStudy().getId());
+        Set<Account> accounts = new HashSet<>();
+        accounts.addAll(study.getManagers());
+        accounts.addAll(study.getMembers());
+
+        accounts.forEach(account -> {
+            if (account.isStudyUpdatedByEmail()) {
+                sendStudyCreatedEmail(study, account, studyUpdateEvent.getMessage(),
+                        "스터디올래, '" + study.getTitle() + "' 스터디에 새소식이 있습니다.");
+            }
+
+            if (account.isStudyUpdatedByWeb()) {
+                createNotification(study, account, studyUpdateEvent.getMessage(), NotificationType.STUDY_UPDATED);
+            }
+        });
+    }
+
+    // contextMessage, emailSubject 파라미터 추가
+    private void sendStudyCreatedEmail(Study study, Account account, String contextMessage, String emailSubject) {
         Context context = new Context();
         context.setVariable("nickname", account.getNickname());
         context.setVariable("link", "/study/" + study.getEncodedPath());
         context.setVariable("linkname", study.getTitle());
-        context.setVariable("message", "새로운 스터디가 생겼습니다.");
+        context.setVariable("message", contextMessage);
         context.setVariable("host", appProperties.getHost());
         String message = templateEngine.process("mail/simple-link", context);
 
         EmailMessage emailMessage = EmailMessage.builder()
-                .subject("스터디올래, '" + study.getTitle() + "' 스터디가 생겼습니다.")
+                .subject(emailSubject)                      // 수정
                 .to(account.getEmail())
                 .message(message)
                 .build();
@@ -71,15 +95,17 @@ public class StudyEventListener {
         emailService.sendEmail(emailMessage);
     }
 
-    private void saveStudyCreatedNotification(Study study, Account account) {
+    // 매개변수 추가 message, nitificationType
+    private void createNotification(Study study, Account account, String message,
+                                    NotificationType notificationType) {
         Notification notification = new Notification();
         notification.setTitle(study.getTitle());
         notification.setLink("/study/" + study.getEncodedPath());
         notification.setChecked(false);
         notification.setCreatedDateTime(LocalDateTime.now());
-        notification.setMessage(study.getShortDescription());
+        notification.setMessage(message);                       // 수정
         notification.setAccount(account);
-        notification.setNotificationType(NotificationType.STUDY_CREATED);
+        notification.setNotificationType(notificationType);     // 수정
         notificationRepository.save(notification);
     }
 }
