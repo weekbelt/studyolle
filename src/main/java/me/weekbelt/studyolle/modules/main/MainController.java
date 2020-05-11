@@ -1,7 +1,9 @@
 package me.weekbelt.studyolle.modules.main;
 
+import lombok.RequiredArgsConstructor;
 import me.weekbelt.studyolle.modules.account.CurrentAccount;
 import me.weekbelt.studyolle.modules.account.Account;
+import me.weekbelt.studyolle.modules.notification.NotificationRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ public class MainController {
         if(account != null){
             model.addAttribute(account);
         }
+
         return "index";
     }
 
