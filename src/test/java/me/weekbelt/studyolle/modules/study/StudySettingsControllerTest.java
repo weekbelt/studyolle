@@ -32,8 +32,7 @@ public class StudySettingsControllerTest {
         Study study = studyFactory.createStudy("test-study", weekbelt);
 
         mockMvc.perform(get("/study/" + study.getPath() + "/settings/description"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("error"));
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
