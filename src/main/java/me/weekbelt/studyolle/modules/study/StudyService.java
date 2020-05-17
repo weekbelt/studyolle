@@ -5,13 +5,17 @@ import me.weekbelt.studyolle.modules.account.Account;
 import me.weekbelt.studyolle.modules.study.event.StudyCreatedEvent;
 import me.weekbelt.studyolle.modules.study.event.StudyUpdateEvent;
 import me.weekbelt.studyolle.modules.tag.Tag;
+import me.weekbelt.studyolle.modules.tag.TagRepository;
 import me.weekbelt.studyolle.modules.zone.Zone;
 import me.weekbelt.studyolle.modules.study.form.StudyDescriptionForm;
+import net.bytebuddy.utility.RandomString;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 
 import static me.weekbelt.studyolle.modules.study.form.StudyForm.VALID_PATH_PATTERN;
 
@@ -28,7 +32,6 @@ public class StudyService {
     public Study createNewStudy(Study study, Account account) {
         Study newStudy = studyRepository.save(study);
         newStudy.addManager(account);
-//        eventPublisher.publishEvent(new StudyCreatedEvent(newStudy)); 삭제
         return newStudy;
     }
 
@@ -136,7 +139,7 @@ public class StudyService {
     }
 
     public boolean isValidPath(String newPath) {
-        if (!newPath.matches(VALID_PATH_PATTERN)){
+        if (!newPath.matches(VALID_PATH_PATTERN)) {
             return false;
         }
 
@@ -157,7 +160,7 @@ public class StudyService {
     }
 
     public void remove(Study study) {
-        if (study.isRemovable()){
+        if (study.isRemovable()) {
             studyRepository.delete(study);
         } else {
             throw new IllegalArgumentException("스터디를 삭제할 수 없습니다.");
@@ -176,4 +179,5 @@ public class StudyService {
         return studyRepository.findStudyOnlyByPath(path)
                 .orElseThrow(() -> new IllegalArgumentException(path + "에 해당하는 스터디가 없습니다."));
     }
+
 }
