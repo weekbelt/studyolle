@@ -1,18 +1,23 @@
 package me.weekbelt.studyolle.modules.study;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPQLQuery;
+import me.weekbelt.studyolle.modules.account.AccountPredicates;
 import me.weekbelt.studyolle.modules.account.QAccount;
 import me.weekbelt.studyolle.modules.tag.QTag;
+import me.weekbelt.studyolle.modules.tag.Tag;
 import me.weekbelt.studyolle.modules.zone.QZone;
+import me.weekbelt.studyolle.modules.zone.Zone;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
+import java.util.Set;
 
-public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport implements StudyRepositoryExtension{
+public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport implements StudyRepositoryExtension {
 
     public StudyRepositoryExtensionImpl() {
         super(Study.class);
@@ -32,5 +37,21 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
         JPQLQuery<Study> pageableQuery = getQuerydsl().applyPagination(pageable, query);
         QueryResults<Study> fetchResults = pageableQuery.fetchResults();
         return new PageImpl<>(fetchResults.getResults(), pageable, fetchResults.getTotal());
+    }
+
+    @Override
+    public List<Study> findByAccount(Set<Tag> tags, Set<Zone> zones) {
+        QStudy study = QStudy.study;
+        JPQLQuery<Study> query = from(study)
+                .where(study.published.isTrue()
+                        .and(study.closed.isFalse())
+                .and(study.tags.any().in(tags))
+                .and(study.zones.any().in(zones)))
+                .leftJoin(study.tags, QTag.tag).fetchJoin()
+                .leftJoin(study.zones, QZone.zone).fetchJoin()
+                .orderBy(study.publishedDateTime.desc())
+                .distinct()
+                .limit(9);
+        return query.fetch();
     }
 }

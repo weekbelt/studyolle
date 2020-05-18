@@ -1,8 +1,11 @@
 package me.weekbelt.studyolle.modules.main;
 
 import lombok.RequiredArgsConstructor;
+import me.weekbelt.studyolle.modules.account.AccountRepository;
 import me.weekbelt.studyolle.modules.account.CurrentAccount;
 import me.weekbelt.studyolle.modules.account.Account;
+import me.weekbelt.studyolle.modules.event.Enrollment;
+import me.weekbelt.studyolle.modules.event.EnrollmentRepository;
 import me.weekbelt.studyolle.modules.notification.NotificationRepository;
 import me.weekbelt.studyolle.modules.study.Study;
 import me.weekbelt.studyolle.modules.study.StudyRepository;
@@ -21,12 +24,27 @@ import java.util.List;
 public class MainController {
 
     private final StudyRepository studyRepository;
+    private final AccountRepository accountRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @GetMapping("/")
     public String home(@CurrentAccount Account account, Model model) {
         if (account != null) {
-            model.addAttribute(account);
+            Account findAccount = accountRepository.findAccountWithTagsAndZonesById(account.getId());
+            List<Enrollment> enrollmentList = enrollmentRepository.findByAccountAndAcceptedOrderByEnrolledAtDesc(account, true);
+            List<Study> studyList = studyRepository.findByAccount(findAccount.getTags(), findAccount.getZones());
+            List<Study> studyManagerOf = studyRepository.findFirst5ByManagersContainingAndClosedOrderByPublishedDateTimeDesc(account, false);
+            List<Study> studyMemberOf = studyRepository.findFirst5ByMembersContainingAndClosedOrderByPublishedDateTimeDesc(account, false);
+
+            model.addAttribute("account", findAccount);
+            model.addAttribute("enrollmentList", enrollmentList);
+            model.addAttribute("studyList", studyList);
+            model.addAttribute("studyManagerOf", studyManagerOf);
+            model.addAttribute("studyMemberOf", studyMemberOf);
+
+            return "index-after-login";
         }
+
         List<Study> studyList = studyRepository.findFirst9ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
         model.addAttribute("studyList", studyList);
         return "index";

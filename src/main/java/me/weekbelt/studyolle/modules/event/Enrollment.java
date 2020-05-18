@@ -7,7 +7,13 @@ import me.weekbelt.studyolle.modules.account.Account;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+@NamedEntityGraph(
+        name = "Enrollment.withEventAndStudy",
+        attributeNodes = {
+                @NamedAttributeNode(value = "event", subgraph = "study")
+        },
+        subgraphs = @NamedSubgraph(name = "study", attributeNodes = @NamedAttributeNode("study"))
+)
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @Entity
 public class Enrollment {
