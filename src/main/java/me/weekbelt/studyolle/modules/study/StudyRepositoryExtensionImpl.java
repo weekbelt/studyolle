@@ -27,7 +27,7 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                 .or(study.zones.any().localNameOfCity.containsIgnoreCase(keyword)))
                 .leftJoin(study.tags, QTag.tag).fetchJoin()
                 .leftJoin(study.zones, QZone.zone).fetchJoin()
-                .leftJoin(study.members, QAccount.account).fetchJoin()
+//                .leftJoin(study.members, QAccount.account).fetchJoin()  삭제
                 .distinct();
         JPQLQuery<Study> pageableQuery = getQuerydsl().applyPagination(pageable, query);
         QueryResults<Study> fetchResults = pageableQuery.fetchResults();

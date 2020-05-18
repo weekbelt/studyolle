@@ -27,7 +27,8 @@ public class MainController {
         if (account != null) {
             model.addAttribute(account);
         }
-
+        List<Study> studyList = studyRepository.findFirst9ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
+        model.addAttribute("studyList", studyList);
         return "index";
     }
 
@@ -43,6 +44,8 @@ public class MainController {
         Page<Study> studyPage = studyRepository.findByKeyword(keyword, pageable);
         model.addAttribute("studyPage", studyPage);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("sortProperty",
+                pageable.getSort().toString().contains("publishedDateTime") ? "publishedDateTime" : "memberCount");
         return "search";
     }
 }

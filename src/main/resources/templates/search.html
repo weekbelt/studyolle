@@ -63,12 +63,12 @@
 <script src="/node_modules/mark.js/dist/jquery.mark.min.js"></script>
 <script type="application/javascript">
     $(function(){
-        var mark = function() {
+        const mark = function() {
             // Read the keyword
-            var keyword = $("#keyword").text();
+            const keyword = $("#keyword").text();
 
             // Determine selected options
-            var options = {
+            const options = {
                 "each": function(element) {
                     setTimeout(function() {
                         $(element).addClass("animate");
